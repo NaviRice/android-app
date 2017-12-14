@@ -3,7 +3,6 @@ package com.navirice.android.services
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.getAs
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
@@ -26,7 +25,7 @@ object GeocodingService {
         println(url)
         val locationSubject: Subject<Location> = BehaviorSubject.create()
         url.httpGet().responseJson { _, _, result ->
-            when(result) {
+            when (result) {
                 is Result.Failure -> {
                     println(result.get())
                 }
