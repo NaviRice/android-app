@@ -25,7 +25,7 @@ object GeocodingService {
         val url = "$BASE_URL/mapbox.places/$locationName.json?country=us&access_token=$MAPBOX_ACCESS_TOKEN"
         println(url)
         val locationSubject: Subject<Location> = BehaviorSubject.create()
-        url.httpGet().responseJson { request, response, result ->
+        url.httpGet().responseJson { _, _, result ->
             when(result) {
                 is Result.Failure -> {
                     println(result.get())

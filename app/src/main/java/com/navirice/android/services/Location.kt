@@ -5,13 +5,4 @@ package com.navirice.android.services
  * @version Dec 14, 2017
  */
 
-class Location(long: Double, lat: Double) {
-
-
-    val long = long
-    val lat = lat
-
-    override fun toString(): String {
-        return "[long: $long, lat: $lat]"
-    }
-}
+data class Location(val longitude: Double,val latitude: Double)
