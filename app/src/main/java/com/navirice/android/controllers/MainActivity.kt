@@ -7,9 +7,9 @@ import android.widget.EditText
 import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.navirice.android.R
+import com.navirice.android.services.GeocodingService
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.withLatestFrom
 
 /**
@@ -43,9 +43,12 @@ class MainActivity : AppCompatActivity() {
         startObservable = RxView.clicks(startButton)
 
         startObservable!!.withLatestFrom(sourceObservable!!, destinationObservable!!)
+                .flatMap { input ->
+                    GeocodingService.getLatAndLong(input.third.toString()) }
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe { input -> println("${input.second} || ${input.third}") }
-
+                .subscribe { location ->
+                    println(location)
+                }
 
     }
 }
