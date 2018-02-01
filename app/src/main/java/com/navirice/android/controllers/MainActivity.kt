@@ -1,16 +1,22 @@
 package com.navirice.android.controllers
 
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import com.jakewharton.rxbinding2.view.RxView
-import com.jakewharton.rxbinding2.widget.RxTextView
 import com.navirice.android.R
+import com.navirice.android.models.Location
+import com.navirice.android.models.Step
+import com.navirice.android.services.DirectionService
 import com.navirice.android.services.GeocodingService
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.withLatestFrom
+import com.navirice.android.services.LocationService
+import io.reactivex.rxkotlin.Observables
+import io.reactivex.subjects.BehaviorSubject
+import java.util.*
 
 /**
  * @author Yang Liu
@@ -18,37 +24,65 @@ import io.reactivex.rxkotlin.withLatestFrom
  */
 class MainActivity : AppCompatActivity() {
 
-    private var sourceObservable: Observable<CharSequence>? = null
-    private var destinationObservable: Observable<CharSequence>? = null
-    private var startObservable: Observable<Any>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val tts = TextToSpeech(this, TextToSpeech.OnInitListener {})
+        tts.language = Locale.US
 
-        val textFieldSource: EditText = findViewById(R.id.text_field_source)
+        val locationService = LocationService()
+        val geocodingService = GeocodingService()
+        val directionService = DirectionService()
 
-        sourceObservable = RxTextView.afterTextChangeEvents(textFieldSource)
-                .observeOn(AndroidSchedulers.mainThread())
-                .map { event -> event.view().text }
+        val textFieldSource = findViewById<EditText>(R.id.text_field_source)
 
 
-        val textFieldDestination: EditText = findViewById(R.id.text_field_destination)
-        destinationObservable = RxTextView.afterTextChangeEvents(textFieldDestination)
-                .observeOn(AndroidSchedulers.mainThread())
-                .map { event -> event.view().text }
+        val textFieldDestination = findViewById<EditText>(R.id.text_field_destination)
 
-        val startButton: Button = findViewById(R.id.start_button);
-        startObservable = RxView.clicks(startButton)
+        val sourceObservable: BehaviorSubject<Location> = BehaviorSubject.create()
 
-        startObservable!!.withLatestFrom(sourceObservable!!, destinationObservable!!)
-                .flatMap { input ->
-                    GeocodingService.getLatAndLong(input.third.toString()) }
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe { location ->
-                    println(location)
+        val startButton: Button = findViewById(R.id.start_button)
+        val nextButton = findViewById<Button>(R.id.next_button)
+
+        val startObservable = RxView.clicks(startButton)
+
+        val destinationObservable = startObservable
+                .map { _ ->
+                    nextButton.isEnabled = false
+                    geocodingService.getLocation(this, textFieldDestination.text.toString())
                 }
 
+        var mSteps: List<Step>? = null
+
+        Observables.combineLatest(sourceObservable, destinationObservable!!)
+                .flatMap { input: Pair<Location, Location> ->
+                    directionService.getDirections(input.first, input.second)
+                }
+                .subscribe { steps: List<Step> ->
+                    mSteps = steps
+                    nextButton.isEnabled = true
+                    Log.d("getDirections", steps.toString())
+                    Log.d("getDirections", steps.size.toString())
+                }
+
+
+        var currentStep = 0
+        RxView.clicks(nextButton)
+                .subscribe {
+                    Log.d("Next Step", mSteps!![currentStep].toString())
+                    tts.speak(mSteps!![currentStep].instruction, TextToSpeech.QUEUE_FLUSH, null, null)
+                            currentStep++
+                    if(currentStep >= mSteps!!.size)
+                        nextButton.isEnabled = false
+                }
+
+        sourceObservable
+                .subscribe { location ->
+                    textFieldSource.setText(geocodingService.getCityAndState(this, location), TextView.BufferType.EDITABLE)
+                }
+
+        locationService.getLastLocation(this, sourceObservable)
     }
 }

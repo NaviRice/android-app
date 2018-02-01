@@ -1,4 +1,4 @@
-package com.navirice.android.services
+package com.navirice.android.models
 
 /**
  * @author Yang Liu

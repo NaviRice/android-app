@@ -22,4 +22,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:text="@string/start"/>
+
+    <Button
+        android:enabled="false"
+        android:id="@+id/next_button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="@string/next"/>
 </android.widget.LinearLayout>
