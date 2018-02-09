@@ -7,23 +7,23 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.jakewharton.rxbinding2.view.RxView
 import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.models.Step
-import com.navirice.android.services.DirectionService
-import com.navirice.android.services.GeocodingService
-import com.navirice.android.services.LocationService
+import com.navirice.android.services.*
+import com.navirice.android.tasks.DataChannelTask
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import java.util.*
+
 
 /**
  * @author Yang Liu
  * @version Oct 26, 2017
  */
 class MainActivity : AppCompatActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,13 +38,14 @@ class MainActivity : AppCompatActivity() {
 
         val textFieldSource = findViewById<EditText>(R.id.text_field_source)
 
-
         val textFieldDestination = findViewById<EditText>(R.id.text_field_destination)
 
         val sourceObservable: BehaviorSubject<Location> = BehaviorSubject.create()
 
         val startButton: Button = findViewById(R.id.start_button)
         val nextButton = findViewById<Button>(R.id.next_button)
+
+        startButton.isEnabled = false
 
         val startObservable = RxView.clicks(startButton)
 
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
         var mSteps: List<Step>? = null
+        var currentStepIndex = 0
 
         Observables.combineLatest(sourceObservable, destinationObservable!!)
                 .flatMap { input: Pair<Location, Location> ->
@@ -62,19 +64,27 @@ class MainActivity : AppCompatActivity() {
                 }
                 .subscribe { steps: List<Step> ->
                     mSteps = steps
+                    currentStepIndex = 0
                     nextButton.isEnabled = true
                     Log.d("getDirections", steps.toString())
                     Log.d("getDirections", steps.size.toString())
                 }
 
 
-        var currentStep = 0
+        val dataChannelService = DataChannelService()
+        val stepService = StepService(dataChannelService)
+
         RxView.clicks(nextButton)
                 .subscribe {
-                    Log.d("Next Step", mSteps!![currentStep].toString())
-                    tts.speak(mSteps!![currentStep].instruction, TextToSpeech.QUEUE_FLUSH, null, null)
-                            currentStep++
-                    if(currentStep >= mSteps!!.size)
+                    val currentStep = mSteps!![currentStepIndex]
+                    Log.d("Next Step", currentStep.toString())
+
+                    stepService.updateCurrentStep(dataChannelService, currentStep)
+
+                    tts.speak(currentStep.instruction, TextToSpeech.QUEUE_FLUSH, null, null)
+                    currentStepIndex++
+
+                    if (currentStepIndex >= mSteps!!.size)
                         nextButton.isEnabled = false
                 }
 
@@ -84,5 +94,27 @@ class MainActivity : AppCompatActivity() {
                 }
 
         locationService.getLastLocation(this, sourceObservable)
+
+        val textFieldServerIP = findViewById<EditText>(R.id.text_field_server_ip)
+        val textFieldServerPort = findViewById<EditText>(R.id.text_field_server_port)
+
+        val connectButton = findViewById<Button>(R.id.connect_button)
+
+        val connectedString = getString(R.string.connected)
+        val connectString = getString(R.string.connect)
+        val toast = Toast.makeText(this, getString(R.string.fail_to_connect), Toast.LENGTH_SHORT)
+
+        connectButton.setOnClickListener({ _ ->
+
+            val serverIP = textFieldServerIP.text
+                    .toString()
+            val serverPort = textFieldServerPort.text
+                    .toString()
+
+            connectButton.isEnabled = false
+            connectButton.text = getString(R.string.connecting)
+
+            DataChannelTask(connectedString, connectString).execute(serverIP, serverPort, dataChannelService, connectButton, startButton, toast)
+        })
     }
 }

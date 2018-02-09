@@ -5,4 +5,4 @@ package com.navirice.android.models
  * @version Dec 14, 2017
  */
 
-data class Location(val longitude: Double,val latitude: Double)
+data class Location(val longitude: Double, val latitude: Double)
