@@ -9,7 +9,7 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.google.android.gms.location.*
 import com.navirice.android.models.Location
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.Observable
 
 
 /**
@@ -46,35 +46,42 @@ class LocationService {
                 LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-    fun startLocationUpdates(context: Activity, currentLocationSubject: BehaviorSubject<Location>) {
-        val settingsClient = LocationServices.getSettingsClient(context)
-        settingsClient.checkLocationSettings(locationSettingsRequest)
+    fun startLocationUpdates(context: Activity): Observable<Location> {
+        return Observable.create<Location> { observer ->
+            val settingsClient = LocationServices.getSettingsClient(context)
+            settingsClient.checkLocationSettings(locationSettingsRequest)
 
-        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-        try {
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest!!, object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val lastLocation = locationResult.lastLocation
-                    val location = Location(lastLocation.longitude, lastLocation.latitude)
-                    currentLocationSubject.onNext(location)
-                }
-            }, Looper.myLooper())
-        } catch (e: SecurityException) {
-
+            try {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest!!, object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        val lastLocation = locationResult.lastLocation
+                        val location = Location(lastLocation.longitude, lastLocation.latitude)
+                        observer.onNext(location)
+                    }
+                }, Looper.myLooper())
+            } catch (e: SecurityException) {
+                observer.onError(e)
+            }
         }
     }
 
-    fun getLastLocation(context: Activity, currentLocationSubject: BehaviorSubject<Location>) {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        try {
-            fusedLocationClient.lastLocation
-                    .addOnSuccessListener(context, { androidLocation ->
-                        val location = Location(androidLocation.longitude, androidLocation.latitude)
-                        currentLocationSubject.onNext(location)
-                    })
-        } catch (e: SecurityException) {
-            print(e.stackTrace)
+    fun getLastLocation(context: Activity): Observable<Location> {
+        return Observable.create<Location> { observer ->
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            try {
+                fusedLocationClient.lastLocation
+                        .addOnSuccessListener(context, { androidLocation ->
+                            if (androidLocation != null) {
+                                val location = Location(androidLocation.longitude, androidLocation.latitude)
+                                observer.onNext(location)
+                            }
+                        })
+            } catch (e: SecurityException) {
+                observer.onError(e)
+            }
         }
+
     }
 }
