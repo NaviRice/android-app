@@ -5,15 +5,23 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.navirice.android"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'MAP_BOX_API_ACCESS_TOKEN', MapBoxAPIAccessToken
+        it.resValue 'string', 'rendering_server_ip', RenderingServerIP
+        it.resValue 'string', 'rendering_server_port', RenderingServerPort
+        it.resValue 'string', 'google_maps_key', (project.findProperty('GOOGLE_MAPS_API_KEY') ?: '')
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -31,9 +39,10 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.google.android.gms:play-services-maps:11.8.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.5'
@@ -44,6 +53,8 @@ dependencies {
     implementation 'com.github.kittinunf.fuel:fuel-android:1.12.0'
     implementation 'com.github.kittinunf.fuel:fuel-jackson:1.12.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.9.0'
+
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
     compile project(':proto')
     testImplementation 'junit:junit:4.12'
