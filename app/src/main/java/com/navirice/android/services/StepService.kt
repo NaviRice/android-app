@@ -1,5 +1,6 @@
 package com.navirice.android.services
 
+import android.content.Context
 import android.util.Log
 import com.google.protobuf.ByteString
 import com.navirice.android.models.Step
@@ -10,11 +11,11 @@ import navirice.proto.RequestOuterClass
  * @author Yang Liu
  * @version Feb 8, 2018
  */
-class StepService(dataChannelService: DataChannelService) {
+object StepService {
 
     private val BASE_URL = "/steps"
 
-    fun updateCurrentStep(dataChannelService: DataChannelService, step: Step) {
+    fun updateCurrentStep(context: Context, step: Step) {
         val requestBuilder = RequestOuterClass.Request.newBuilder()
         requestBuilder.command = RequestOuterClass.Request.Command.UPDATE
         requestBuilder.resource = "$BASE_URL/current"
@@ -27,7 +28,6 @@ class StepService(dataChannelService: DataChannelService) {
 
         Log.d(this.javaClass.simpleName, request.toString())
 
-        dataChannelService.outputStream!!
-                .write(request.toByteArray())
+        RealTimeTransportService.send(context, request)
     }
 }

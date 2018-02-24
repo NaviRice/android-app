@@ -2,6 +2,7 @@ package com.navirice.android.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -9,10 +10,11 @@ import android.widget.Toast
 import com.jakewharton.rxbinding2.view.RxView
 import com.navirice.android.R
 import com.navirice.android.models.Location
-import com.navirice.android.services.DataChannelService
+import com.navirice.android.models.Step
 import com.navirice.android.services.GeocodingService
 import com.navirice.android.services.LocationService
-import com.navirice.android.tasks.DataChannelTask
+import com.navirice.android.services.RealTimeTransportService
+import com.navirice.android.services.StepService
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
@@ -26,25 +28,24 @@ import io.reactivex.subjects.Subject
 class MainActivity : AppCompatActivity() {
 
     // Views
-    var mSourceEditText: EditText? = null
-    var mDestinationEditText: EditText? = null
-    var mServerIPEditText: EditText? = null
-    var mServerPortEditText: EditText? = null
-    var mConnectToServerButton: Button? = null
-    var mStartNavigationButton: Button? = null
+    private var mSourceEditText: EditText? = null
+    private var mDestinationEditText: EditText? = null
+    private var mServerIPEditText: EditText? = null
+    private var mServerPortEditText: EditText? = null
+    private var mConnectToServerButton: Button? = null
+    private var mStartNavigationButton: Button? = null
 
     // Services
-    var mLocationService: LocationService? = null
-    var mGeocodingService: GeocodingService? = null
-    var mDataChannelService: DataChannelService? = null
+    private var mLocationService: LocationService? = null
+    private var mGeocodingService: GeocodingService? = null
 
     // Subjects
-    var mSourceSubject: Subject<Location>? = null
+    private var mSourceSubject: Subject<Location>? = null
 
     // Observables
-    var clickStartNavigationObservable: Observable<Any>? = null
-    var clickConnectToServerObservable: Observable<Any>? = null
-    var destinationObservable: Observable<Location>? = null
+    private var clickStartNavigationObservable: Observable<Any>? = null
+    private var clickConnectToServerObservable: Observable<Any>? = null
+    private var destinationObservable: Observable<Location>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,19 +92,39 @@ class MainActivity : AppCompatActivity() {
     private fun connectToServer(connectedString: String, connectString: String, toast: Toast): (_: Any) -> Unit {
         return { _ ->
             val serverIP = mServerIPEditText!!.text.toString()
-            val serverPort = mServerPortEditText!!.text.toString()
+            val serverPort = mServerPortEditText!!.text.toString().toInt()
 
             mConnectToServerButton!!.isEnabled = false
             mConnectToServerButton!!.text = getString(R.string.connecting)
 
-            DataChannelTask(connectedString, connectString).execute(
-                    serverIP,
-                    serverPort,
-                    mDataChannelService,
-                    mConnectToServerButton,
-                    mStartNavigationButton,
-                    toast
-            )
+            RealTimeTransportService.onConnected(this, {
+                Log.d("RealTimeTransport", "onConnected")
+                mConnectToServerButton!!.text = connectedString
+                mStartNavigationButton!!.isEnabled = true
+
+                val step = Step("Super Street", "Turn left onto Super Street", "turn_left")
+                StepService.updateCurrentStep(this, step)
+            })
+
+            RealTimeTransportService.onDisconnected(this, {
+                Log.d("RealTimeTransport", "onDisconnected")
+                mConnectToServerButton!!.text = connectString
+                mConnectToServerButton!!.isEnabled = true
+                mStartNavigationButton!!.isEnabled = false
+            })
+
+            RealTimeTransportService.onReceiveResponse(this, { response ->
+                Log.d("RealTimeTransport", response.toString())
+            })
+
+            RealTimeTransportService.onServerNotFound(this, {
+                Log.d("RealTimeTransport", "onServerNotFound")
+                mConnectToServerButton!!.text = connectString
+                mConnectToServerButton!!.isEnabled = true
+                toast.show()
+            })
+
+            RealTimeTransportService.start(this, serverIP, serverPort)
         }
 
     }
@@ -131,7 +152,6 @@ class MainActivity : AppCompatActivity() {
     private fun initServices() {
         mLocationService = LocationService()
         mGeocodingService = GeocodingService()
-        mDataChannelService = DataChannelService()
     }
 
     private fun findAndInitViews() {
