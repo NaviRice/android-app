@@ -20,13 +20,14 @@ import com.navirice.android.tasks.DataChannelTask
 
 class DataChannelService : Service() {
     var mStreamingService: StreamingService? = null
-    private var mLocalBroadcastManager = LocalBroadcastManager.getInstance(this)
+    private var mLocalBroadcastManager: LocalBroadcastManager? = null
 
     override fun onCreate() {
 
         mStreamingService = StreamingService()
 
-        mLocalBroadcastManager.registerReceiver(object : BroadcastReceiver() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this)
+        mLocalBroadcastManager!!.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val data = intent.getByteArrayExtra(DataChannelServiceContract.DATA)
                 mStreamingService!!.send(data)
@@ -53,26 +54,26 @@ class DataChannelService : Service() {
     private fun connected() {
         Log.d("DataChannelService", "CONNECTED")
         val connectedIntent = Intent(ActionContract.CONNECTED)
-        mLocalBroadcastManager.sendBroadcast(connectedIntent)
+        mLocalBroadcastManager!!.sendBroadcast(connectedIntent)
     }
 
     private fun serverNotFound() {
         Log.d("DataChannelService", "SERVER_NOT_FOUND")
         val serverNotFoundIntent = Intent(ActionContract.SERVER_NOT_FOUND)
-        mLocalBroadcastManager.sendBroadcast(serverNotFoundIntent)
+        mLocalBroadcastManager!! .sendBroadcast(serverNotFoundIntent)
     }
 
     private fun receiveData(data: ByteArray) {
         Log.d("DataChannelService", "RECEIVE_DATA")
         val receiveDataIntent = Intent(ActionContract.RECEIVE_DATA)
         receiveDataIntent.putExtra(DataChannelServiceContract.DATA, data)
-        mLocalBroadcastManager.sendBroadcast(receiveDataIntent)
+        mLocalBroadcastManager!!.sendBroadcast(receiveDataIntent)
     }
 
     private fun disconnected() {
         Log.d("DataChannelService", "DISCONNECTED")
         val disconnectedFromServerIntent = Intent(ActionContract.DISCONNECTED)
-        mLocalBroadcastManager.sendBroadcast(disconnectedFromServerIntent)
+        mLocalBroadcastManager!!.sendBroadcast(disconnectedFromServerIntent)
     }
 
     override fun onBind(p0: Intent?): IBinder? {

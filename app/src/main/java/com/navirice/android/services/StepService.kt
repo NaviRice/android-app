@@ -2,10 +2,9 @@ package com.navirice.android.services
 
 import android.content.Context
 import android.util.Log
-import com.google.protobuf.ByteString
 import com.navirice.android.models.Step
-import kotlinx.serialization.json.JSON
 import navirice.proto.RequestOuterClass
+import navirice.proto.StepOuterClass
 
 /**
  * @author Yang Liu
@@ -13,16 +12,21 @@ import navirice.proto.RequestOuterClass
  */
 object StepService {
 
-    private val BASE_URL = "/steps"
-
     fun updateCurrentStep(context: Context, step: Step) {
         val requestBuilder = RequestOuterClass.Request.newBuilder()
-        requestBuilder.command = RequestOuterClass.Request.Command.UPDATE
-        requestBuilder.resource = "$BASE_URL/current"
-        requestBuilder.options = ""
+        requestBuilder.type = RequestOuterClass.Request.Type.CURRENT_STEP
 
-        val body = JSON.stringify(step).toByteArray()
-        requestBuilder.body = ByteString.copyFrom(body)
+        val stepBuilder = StepOuterClass.Step.newBuilder()
+
+        stepBuilder.latitude = step.location.latitude
+        stepBuilder.longitude = step.location.longitude
+        stepBuilder.description = step.instruction
+        stepBuilder.icon = step.icon
+
+        val stepData = stepBuilder.build()
+
+        requestBuilder.length = stepData.serializedSize
+        requestBuilder.body = stepData.toByteString()
 
         val request = requestBuilder.build()
 

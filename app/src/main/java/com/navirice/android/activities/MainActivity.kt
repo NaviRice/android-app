@@ -3,6 +3,8 @@ package com.navirice.android.activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -19,6 +21,7 @@ import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
+import java.util.*
 
 
 /**
@@ -47,6 +50,8 @@ class MainActivity : AppCompatActivity() {
     private var clickConnectToServerObservable: Observable<Any>? = null
     private var destinationObservable: Observable<Location>? = null
 
+    val random = Random()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,6 +70,24 @@ class MainActivity : AppCompatActivity() {
         getCurrentLocation()
 
         initClickToServerHandler()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.test_nav_item -> {
+
+                val step = Step("", "Instruction", "Icon", Location(random.nextDouble(), random.nextDouble()))
+                StepService.updateCurrentStep(this, step)
+//                startNavigation(Pair(Location(-71.806651, 42.274869), Location(-71.807196, 42.275899)))
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun getCurrentLocation() {
@@ -101,9 +124,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d("RealTimeTransport", "onConnected")
                 mConnectToServerButton!!.text = connectedString
                 mStartNavigationButton!!.isEnabled = true
-
-                val step = Step("Super Street", "Turn left onto Super Street", "turn_left")
-                StepService.updateCurrentStep(this, step)
             })
 
             RealTimeTransportService.onDisconnected(this, {

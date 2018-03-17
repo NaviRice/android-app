@@ -8,7 +8,7 @@ import com.mapbox.api.directions.v5.models.StepManeuver
  */
 
 object Utilities {
-     fun getIconIdentifier(stepManeuver: StepManeuver): String {
+    fun getIconIdentifier(stepManeuver: StepManeuver): String {
         val iconPieces = mutableListOf<String>()
         iconPieces.add(stepManeuver.type()!!)
         if (stepManeuver.modifier() != null) {

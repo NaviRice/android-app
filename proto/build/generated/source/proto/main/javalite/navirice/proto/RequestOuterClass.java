@@ -13,55 +13,21 @@ public final class RequestOuterClass {
       com.google.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    int getCommandValue();
+    int getTypeValue();
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    navirice.proto.RequestOuterClass.Request.Command getCommand();
+    navirice.proto.RequestOuterClass.Request.Type getType();
 
     /**
-     * <code>optional string resource = 2;</code>
+     * <code>optional uint32 length = 2;</code>
      */
-    java.lang.String getResource();
-    /**
-     * <code>optional string resource = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getResourceBytes();
+    int getLength();
 
     /**
-     * <code>optional string options = 3;</code>
-     */
-    java.lang.String getOptions();
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getOptionsBytes();
-
-    /**
-     * <code>optional sint64 time = 6;</code>
-     */
-    long getTime();
-
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    int getContentTypeValue();
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    navirice.proto.ContentTypeOuterClass.ContentType getContentType();
-
-    /**
-     * <code>optional int32 payloadLength = 8;</code>
-     */
-    int getPayloadLength();
-
-    /**
-     * <code>optional bytes body = 9;</code>
+     * <code>optional bytes body = 3;</code>
      */
     com.google.protobuf.ByteString getBody();
   }
@@ -74,82 +40,32 @@ public final class RequestOuterClass {
       // @@protoc_insertion_point(message_implements:navirice.proto.Request)
       RequestOrBuilder {
     private Request() {
-      resource_ = "";
-      options_ = "";
       body_ = com.google.protobuf.ByteString.EMPTY;
     }
     /**
-     * Protobuf enum {@code navirice.proto.Request.Command}
+     * Protobuf enum {@code navirice.proto.Request.Type}
      */
-    public enum Command
+    public enum Type
         implements com.google.protobuf.Internal.EnumLite {
       /**
-       * <code>INDEX = 0;</code>
+       * <code>CURRENT_STEP = 0;</code>
        */
-      INDEX(0),
+      CURRENT_STEP(0),
       /**
-       * <code>CREATE = 1;</code>
+       * <code>CURRENT_LOCATION = 1;</code>
        */
-      CREATE(1),
-      /**
-       * <code>SHOW = 2;</code>
-       */
-      SHOW(2),
-      /**
-       * <code>UPDATE = 3;</code>
-       */
-      UPDATE(3),
-      /**
-       * <code>DESTROY = 4;</code>
-       */
-      DESTROY(4),
-      /**
-       * <code>SUBSCRIBE = 5;</code>
-       */
-      SUBSCRIBE(5),
-      /**
-       * <code>UNSUBSCRIBE = 6;</code>
-       */
-      UNSUBSCRIBE(6),
-      /**
-       * <code>REMOTE_PROCEDURE_CALL = 7;</code>
-       */
-      REMOTE_PROCEDURE_CALL(7),
+      CURRENT_LOCATION(1),
       UNRECOGNIZED(-1),
       ;
 
       /**
-       * <code>INDEX = 0;</code>
+       * <code>CURRENT_STEP = 0;</code>
        */
-      public static final int INDEX_VALUE = 0;
+      public static final int CURRENT_STEP_VALUE = 0;
       /**
-       * <code>CREATE = 1;</code>
+       * <code>CURRENT_LOCATION = 1;</code>
        */
-      public static final int CREATE_VALUE = 1;
-      /**
-       * <code>SHOW = 2;</code>
-       */
-      public static final int SHOW_VALUE = 2;
-      /**
-       * <code>UPDATE = 3;</code>
-       */
-      public static final int UPDATE_VALUE = 3;
-      /**
-       * <code>DESTROY = 4;</code>
-       */
-      public static final int DESTROY_VALUE = 4;
-      /**
-       * <code>SUBSCRIBE = 5;</code>
-       */
-      public static final int SUBSCRIBE_VALUE = 5;
-      /**
-       * <code>UNSUBSCRIBE = 6;</code>
-       */
-      public static final int UNSUBSCRIBE_VALUE = 6;
-      /**
-       * <code>REMOTE_PROCEDURE_CALL = 7;</code>
-       */
-      public static final int REMOTE_PROCEDURE_CALL_VALUE = 7;
+      public static final int CURRENT_LOCATION_VALUE = 1;
 
 
       public final int getNumber() {
@@ -160,271 +76,111 @@ public final class RequestOuterClass {
        * @deprecated Use {@link #forNumber(int)} instead.
        */
       @java.lang.Deprecated
-      public static Command valueOf(int value) {
+      public static Type valueOf(int value) {
         return forNumber(value);
       }
 
-      public static Command forNumber(int value) {
+      public static Type forNumber(int value) {
         switch (value) {
-          case 0: return INDEX;
-          case 1: return CREATE;
-          case 2: return SHOW;
-          case 3: return UPDATE;
-          case 4: return DESTROY;
-          case 5: return SUBSCRIBE;
-          case 6: return UNSUBSCRIBE;
-          case 7: return REMOTE_PROCEDURE_CALL;
+          case 0: return CURRENT_STEP;
+          case 1: return CURRENT_LOCATION;
           default: return null;
         }
       }
 
-      public static com.google.protobuf.Internal.EnumLiteMap<Command>
+      public static com.google.protobuf.Internal.EnumLiteMap<Type>
           internalGetValueMap() {
         return internalValueMap;
       }
       private static final com.google.protobuf.Internal.EnumLiteMap<
-          Command> internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Command>() {
-              public Command findValueByNumber(int number) {
-                return Command.forNumber(number);
+          Type> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Type>() {
+              public Type findValueByNumber(int number) {
+                return Type.forNumber(number);
               }
             };
 
       private final int value;
 
-      private Command(int value) {
+      private Type(int value) {
         this.value = value;
       }
 
-      // @@protoc_insertion_point(enum_scope:navirice.proto.Request.Command)
+      // @@protoc_insertion_point(enum_scope:navirice.proto.Request.Type)
     }
 
-    public static final int COMMAND_FIELD_NUMBER = 1;
-    private int command_;
+    public static final int TYPE_FIELD_NUMBER = 1;
+    private int type_;
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    public int getCommandValue() {
-      return command_;
+    public int getTypeValue() {
+      return type_;
     }
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    public navirice.proto.RequestOuterClass.Request.Command getCommand() {
-      navirice.proto.RequestOuterClass.Request.Command result = navirice.proto.RequestOuterClass.Request.Command.forNumber(command_);
-      return result == null ? navirice.proto.RequestOuterClass.Request.Command.UNRECOGNIZED : result;
+    public navirice.proto.RequestOuterClass.Request.Type getType() {
+      navirice.proto.RequestOuterClass.Request.Type result = navirice.proto.RequestOuterClass.Request.Type.forNumber(type_);
+      return result == null ? navirice.proto.RequestOuterClass.Request.Type.UNRECOGNIZED : result;
     }
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    private void setCommandValue(int value) {
-        command_ = value;
+    private void setTypeValue(int value) {
+        type_ = value;
     }
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    private void setCommand(navirice.proto.RequestOuterClass.Request.Command value) {
+    private void setType(navirice.proto.RequestOuterClass.Request.Type value) {
       if (value == null) {
         throw new NullPointerException();
       }
       
-      command_ = value.getNumber();
+      type_ = value.getNumber();
     }
     /**
-     * <code>optional .navirice.proto.Request.Command command = 1;</code>
+     * <code>optional .navirice.proto.Request.Type type = 1;</code>
      */
-    private void clearCommand() {
+    private void clearType() {
       
-      command_ = 0;
+      type_ = 0;
     }
 
-    public static final int RESOURCE_FIELD_NUMBER = 2;
-    private java.lang.String resource_;
+    public static final int LENGTH_FIELD_NUMBER = 2;
+    private int length_;
     /**
-     * <code>optional string resource = 2;</code>
+     * <code>optional uint32 length = 2;</code>
      */
-    public java.lang.String getResource() {
-      return resource_;
+    public int getLength() {
+      return length_;
     }
     /**
-     * <code>optional string resource = 2;</code>
+     * <code>optional uint32 length = 2;</code>
      */
-    public com.google.protobuf.ByteString
-        getResourceBytes() {
-      return com.google.protobuf.ByteString.copyFromUtf8(resource_);
-    }
-    /**
-     * <code>optional string resource = 2;</code>
-     */
-    private void setResource(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      resource_ = value;
-    }
-    /**
-     * <code>optional string resource = 2;</code>
-     */
-    private void clearResource() {
+    private void setLength(int value) {
       
-      resource_ = getDefaultInstance().getResource();
+      length_ = value;
     }
     /**
-     * <code>optional string resource = 2;</code>
+     * <code>optional uint32 length = 2;</code>
      */
-    private void setResourceBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+    private void clearLength() {
       
-      resource_ = value.toStringUtf8();
+      length_ = 0;
     }
 
-    public static final int OPTIONS_FIELD_NUMBER = 3;
-    private java.lang.String options_;
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    public java.lang.String getOptions() {
-      return options_;
-    }
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getOptionsBytes() {
-      return com.google.protobuf.ByteString.copyFromUtf8(options_);
-    }
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    private void setOptions(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      options_ = value;
-    }
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    private void clearOptions() {
-      
-      options_ = getDefaultInstance().getOptions();
-    }
-    /**
-     * <code>optional string options = 3;</code>
-     */
-    private void setOptionsBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      options_ = value.toStringUtf8();
-    }
-
-    public static final int TIME_FIELD_NUMBER = 6;
-    private long time_;
-    /**
-     * <code>optional sint64 time = 6;</code>
-     */
-    public long getTime() {
-      return time_;
-    }
-    /**
-     * <code>optional sint64 time = 6;</code>
-     */
-    private void setTime(long value) {
-      
-      time_ = value;
-    }
-    /**
-     * <code>optional sint64 time = 6;</code>
-     */
-    private void clearTime() {
-      
-      time_ = 0L;
-    }
-
-    public static final int CONTENTTYPE_FIELD_NUMBER = 7;
-    private int contentType_;
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    public int getContentTypeValue() {
-      return contentType_;
-    }
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    public navirice.proto.ContentTypeOuterClass.ContentType getContentType() {
-      navirice.proto.ContentTypeOuterClass.ContentType result = navirice.proto.ContentTypeOuterClass.ContentType.forNumber(contentType_);
-      return result == null ? navirice.proto.ContentTypeOuterClass.ContentType.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    private void setContentTypeValue(int value) {
-        contentType_ = value;
-    }
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    private void setContentType(navirice.proto.ContentTypeOuterClass.ContentType value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      
-      contentType_ = value.getNumber();
-    }
-    /**
-     * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-     */
-    private void clearContentType() {
-      
-      contentType_ = 0;
-    }
-
-    public static final int PAYLOADLENGTH_FIELD_NUMBER = 8;
-    private int payloadLength_;
-    /**
-     * <code>optional int32 payloadLength = 8;</code>
-     */
-    public int getPayloadLength() {
-      return payloadLength_;
-    }
-    /**
-     * <code>optional int32 payloadLength = 8;</code>
-     */
-    private void setPayloadLength(int value) {
-      
-      payloadLength_ = value;
-    }
-    /**
-     * <code>optional int32 payloadLength = 8;</code>
-     */
-    private void clearPayloadLength() {
-      
-      payloadLength_ = 0;
-    }
-
-    public static final int BODY_FIELD_NUMBER = 9;
+    public static final int BODY_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString body_;
     /**
-     * <code>optional bytes body = 9;</code>
+     * <code>optional bytes body = 3;</code>
      */
     public com.google.protobuf.ByteString getBody() {
       return body_;
     }
     /**
-     * <code>optional bytes body = 9;</code>
+     * <code>optional bytes body = 3;</code>
      */
     private void setBody(com.google.protobuf.ByteString value) {
       if (value == null) {
@@ -434,7 +190,7 @@ public final class RequestOuterClass {
       body_ = value;
     }
     /**
-     * <code>optional bytes body = 9;</code>
+     * <code>optional bytes body = 3;</code>
      */
     private void clearBody() {
       
@@ -443,26 +199,14 @@ public final class RequestOuterClass {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (command_ != navirice.proto.RequestOuterClass.Request.Command.INDEX.getNumber()) {
-        output.writeEnum(1, command_);
+      if (type_ != navirice.proto.RequestOuterClass.Request.Type.CURRENT_STEP.getNumber()) {
+        output.writeEnum(1, type_);
       }
-      if (!resource_.isEmpty()) {
-        output.writeString(2, getResource());
-      }
-      if (!options_.isEmpty()) {
-        output.writeString(3, getOptions());
-      }
-      if (time_ != 0L) {
-        output.writeSInt64(6, time_);
-      }
-      if (contentType_ != navirice.proto.ContentTypeOuterClass.ContentType.TEXT_PLAIN.getNumber()) {
-        output.writeEnum(7, contentType_);
-      }
-      if (payloadLength_ != 0) {
-        output.writeInt32(8, payloadLength_);
+      if (length_ != 0) {
+        output.writeUInt32(2, length_);
       }
       if (!body_.isEmpty()) {
-        output.writeBytes(9, body_);
+        output.writeBytes(3, body_);
       }
     }
 
@@ -471,33 +215,17 @@ public final class RequestOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (command_ != navirice.proto.RequestOuterClass.Request.Command.INDEX.getNumber()) {
+      if (type_ != navirice.proto.RequestOuterClass.Request.Type.CURRENT_STEP.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, command_);
+          .computeEnumSize(1, type_);
       }
-      if (!resource_.isEmpty()) {
+      if (length_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getResource());
-      }
-      if (!options_.isEmpty()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(3, getOptions());
-      }
-      if (time_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(6, time_);
-      }
-      if (contentType_ != navirice.proto.ContentTypeOuterClass.ContentType.TEXT_PLAIN.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(7, contentType_);
-      }
-      if (payloadLength_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, payloadLength_);
+          .computeUInt32Size(2, length_);
       }
       if (!body_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, body_);
+          .computeBytesSize(3, body_);
       }
       memoizedSerializedSize = size;
       return size;
@@ -586,213 +314,73 @@ public final class RequestOuterClass {
 
 
       /**
-       * <code>optional .navirice.proto.Request.Command command = 1;</code>
+       * <code>optional .navirice.proto.Request.Type type = 1;</code>
        */
-      public int getCommandValue() {
-        return instance.getCommandValue();
+      public int getTypeValue() {
+        return instance.getTypeValue();
       }
       /**
-       * <code>optional .navirice.proto.Request.Command command = 1;</code>
+       * <code>optional .navirice.proto.Request.Type type = 1;</code>
        */
-      public Builder setCommandValue(int value) {
+      public Builder setTypeValue(int value) {
         copyOnWrite();
-        instance.setCommandValue(value);
+        instance.setTypeValue(value);
         return this;
       }
       /**
-       * <code>optional .navirice.proto.Request.Command command = 1;</code>
+       * <code>optional .navirice.proto.Request.Type type = 1;</code>
        */
-      public navirice.proto.RequestOuterClass.Request.Command getCommand() {
-        return instance.getCommand();
+      public navirice.proto.RequestOuterClass.Request.Type getType() {
+        return instance.getType();
       }
       /**
-       * <code>optional .navirice.proto.Request.Command command = 1;</code>
+       * <code>optional .navirice.proto.Request.Type type = 1;</code>
        */
-      public Builder setCommand(navirice.proto.RequestOuterClass.Request.Command value) {
+      public Builder setType(navirice.proto.RequestOuterClass.Request.Type value) {
         copyOnWrite();
-        instance.setCommand(value);
+        instance.setType(value);
         return this;
       }
       /**
-       * <code>optional .navirice.proto.Request.Command command = 1;</code>
+       * <code>optional .navirice.proto.Request.Type type = 1;</code>
        */
-      public Builder clearCommand() {
+      public Builder clearType() {
         copyOnWrite();
-        instance.clearCommand();
-        return this;
-      }
-
-      /**
-       * <code>optional string resource = 2;</code>
-       */
-      public java.lang.String getResource() {
-        return instance.getResource();
-      }
-      /**
-       * <code>optional string resource = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getResourceBytes() {
-        return instance.getResourceBytes();
-      }
-      /**
-       * <code>optional string resource = 2;</code>
-       */
-      public Builder setResource(
-          java.lang.String value) {
-        copyOnWrite();
-        instance.setResource(value);
-        return this;
-      }
-      /**
-       * <code>optional string resource = 2;</code>
-       */
-      public Builder clearResource() {
-        copyOnWrite();
-        instance.clearResource();
-        return this;
-      }
-      /**
-       * <code>optional string resource = 2;</code>
-       */
-      public Builder setResourceBytes(
-          com.google.protobuf.ByteString value) {
-        copyOnWrite();
-        instance.setResourceBytes(value);
+        instance.clearType();
         return this;
       }
 
       /**
-       * <code>optional string options = 3;</code>
+       * <code>optional uint32 length = 2;</code>
        */
-      public java.lang.String getOptions() {
-        return instance.getOptions();
+      public int getLength() {
+        return instance.getLength();
       }
       /**
-       * <code>optional string options = 3;</code>
+       * <code>optional uint32 length = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getOptionsBytes() {
-        return instance.getOptionsBytes();
-      }
-      /**
-       * <code>optional string options = 3;</code>
-       */
-      public Builder setOptions(
-          java.lang.String value) {
+      public Builder setLength(int value) {
         copyOnWrite();
-        instance.setOptions(value);
+        instance.setLength(value);
         return this;
       }
       /**
-       * <code>optional string options = 3;</code>
+       * <code>optional uint32 length = 2;</code>
        */
-      public Builder clearOptions() {
+      public Builder clearLength() {
         copyOnWrite();
-        instance.clearOptions();
-        return this;
-      }
-      /**
-       * <code>optional string options = 3;</code>
-       */
-      public Builder setOptionsBytes(
-          com.google.protobuf.ByteString value) {
-        copyOnWrite();
-        instance.setOptionsBytes(value);
+        instance.clearLength();
         return this;
       }
 
       /**
-       * <code>optional sint64 time = 6;</code>
-       */
-      public long getTime() {
-        return instance.getTime();
-      }
-      /**
-       * <code>optional sint64 time = 6;</code>
-       */
-      public Builder setTime(long value) {
-        copyOnWrite();
-        instance.setTime(value);
-        return this;
-      }
-      /**
-       * <code>optional sint64 time = 6;</code>
-       */
-      public Builder clearTime() {
-        copyOnWrite();
-        instance.clearTime();
-        return this;
-      }
-
-      /**
-       * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-       */
-      public int getContentTypeValue() {
-        return instance.getContentTypeValue();
-      }
-      /**
-       * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-       */
-      public Builder setContentTypeValue(int value) {
-        copyOnWrite();
-        instance.setContentTypeValue(value);
-        return this;
-      }
-      /**
-       * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-       */
-      public navirice.proto.ContentTypeOuterClass.ContentType getContentType() {
-        return instance.getContentType();
-      }
-      /**
-       * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-       */
-      public Builder setContentType(navirice.proto.ContentTypeOuterClass.ContentType value) {
-        copyOnWrite();
-        instance.setContentType(value);
-        return this;
-      }
-      /**
-       * <code>optional .navirice.proto.ContentType contentType = 7;</code>
-       */
-      public Builder clearContentType() {
-        copyOnWrite();
-        instance.clearContentType();
-        return this;
-      }
-
-      /**
-       * <code>optional int32 payloadLength = 8;</code>
-       */
-      public int getPayloadLength() {
-        return instance.getPayloadLength();
-      }
-      /**
-       * <code>optional int32 payloadLength = 8;</code>
-       */
-      public Builder setPayloadLength(int value) {
-        copyOnWrite();
-        instance.setPayloadLength(value);
-        return this;
-      }
-      /**
-       * <code>optional int32 payloadLength = 8;</code>
-       */
-      public Builder clearPayloadLength() {
-        copyOnWrite();
-        instance.clearPayloadLength();
-        return this;
-      }
-
-      /**
-       * <code>optional bytes body = 9;</code>
+       * <code>optional bytes body = 3;</code>
        */
       public com.google.protobuf.ByteString getBody() {
         return instance.getBody();
       }
       /**
-       * <code>optional bytes body = 9;</code>
+       * <code>optional bytes body = 3;</code>
        */
       public Builder setBody(com.google.protobuf.ByteString value) {
         copyOnWrite();
@@ -800,7 +388,7 @@ public final class RequestOuterClass {
         return this;
       }
       /**
-       * <code>optional bytes body = 9;</code>
+       * <code>optional bytes body = 3;</code>
        */
       public Builder clearBody() {
         copyOnWrite();
@@ -829,16 +417,9 @@ public final class RequestOuterClass {
         case VISIT: {
           Visitor visitor = (Visitor) arg0;
           navirice.proto.RequestOuterClass.Request other = (navirice.proto.RequestOuterClass.Request) arg1;
-          command_ = visitor.visitInt(command_ != 0, command_,    other.command_ != 0, other.command_);
-          resource_ = visitor.visitString(!resource_.isEmpty(), resource_,
-              !other.resource_.isEmpty(), other.resource_);
-          options_ = visitor.visitString(!options_.isEmpty(), options_,
-              !other.options_.isEmpty(), other.options_);
-          time_ = visitor.visitLong(time_ != 0L, time_,
-              other.time_ != 0L, other.time_);
-          contentType_ = visitor.visitInt(contentType_ != 0, contentType_,    other.contentType_ != 0, other.contentType_);
-          payloadLength_ = visitor.visitInt(payloadLength_ != 0, payloadLength_,
-              other.payloadLength_ != 0, other.payloadLength_);
+          type_ = visitor.visitInt(type_ != 0, type_,    other.type_ != 0, other.type_);
+          length_ = visitor.visitInt(length_ != 0, length_,
+              other.length_ != 0, other.length_);
           body_ = visitor.visitByteString(body_ != com.google.protobuf.ByteString.EMPTY, body_,
               other.body_ != com.google.protobuf.ByteString.EMPTY, other.body_);
           if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
@@ -868,38 +449,15 @@ public final class RequestOuterClass {
                 case 8: {
                   int rawValue = input.readEnum();
 
-                  command_ = rawValue;
+                  type_ = rawValue;
                   break;
                 }
-                case 18: {
-                  String s = input.readStringRequireUtf8();
+                case 16: {
 
-                  resource_ = s;
+                  length_ = input.readUInt32();
                   break;
                 }
                 case 26: {
-                  String s = input.readStringRequireUtf8();
-
-                  options_ = s;
-                  break;
-                }
-                case 48: {
-
-                  time_ = input.readSInt64();
-                  break;
-                }
-                case 56: {
-                  int rawValue = input.readEnum();
-
-                  contentType_ = rawValue;
-                  break;
-                }
-                case 64: {
-
-                  payloadLength_ = input.readInt32();
-                  break;
-                }
-                case 74: {
 
                   body_ = input.readBytes();
                   break;

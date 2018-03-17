@@ -2,19 +2,24 @@ package com.navirice.android.activities
 
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolylineOptions
-import com.mapbox.api.directions.v5.models.LegStep
+import android.widget.TextView
 import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerMode
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute
+import com.mapbox.services.android.telemetry.location.LocationEngine
+import com.mapbox.services.android.telemetry.location.LocationEngineListener
+import com.mapbox.services.android.telemetry.location.LocationEnginePriority
+import com.mapbox.services.android.telemetry.location.LostLocationEngine
+import com.navirice.android.BuildConfig
 import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.services.NavigationService
@@ -25,73 +30,110 @@ import com.navirice.android.services.NavigationService
  * @version Feb 18, 2018
  */
 
-class NavigationActivity : AppCompatActivity(), OnMapReadyCallback {
-    var mapView: MapView? = null
-    var steps: List<LegStep>? = null
+class NavigationActivity : AppCompatActivity(), LocationEngineListener {
+    private var mNavigationService: NavigationService? = null
+    private var mMapView: MapView? = null
+    private var map: MapboxMap? = null
+    private var locationPlugin: LocationLayerPlugin? = null
+    private var locationEngine: LocationEngine? = null
+    private var origin: Location? = null
+    private var destination: LatLng? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
+
+        val debugTextView = findViewById<TextView>(R.id.text_view_debug)
 
         val sourceLatitude = intent.getDoubleExtra(SOURCE_LATITUDE, 0.0)
         val sourceLongitude = intent.getDoubleExtra(SOURCE_LONGITUDE, 0.0)
         val destinationLatitude = intent.getDoubleExtra(DESTINATION_LATITUDE, 0.0)
         val destinationLongitude = intent.getDoubleExtra(DESTINATION_LONGITUDE, 0.0)
 
-        val origin = Point.fromLngLat(sourceLongitude, sourceLatitude)
-        val destination = Point.fromLngLat(destinationLongitude, destinationLatitude)
 
-        mapView = findViewById(R.id.map_view_routes)
-        mapView!!.onCreate(savedInstanceState)
+        origin = Location(sourceLongitude, sourceLatitude)
+        destination = LatLng(destinationLatitude, destinationLongitude)
 
-        val navigationService = NavigationService(this)
-        navigationService.addProgressChangeListener { instruction, iconID, stepIndex, distanceRemaining, durationRemaining ->
-            Log.d("addProgressChange", "$instruction $iconID $stepIndex $distanceRemaining $durationRemaining")
-        }
-        navigationService.startNavigation(origin, destination) { directionRoute ->
-            steps = directionRoute.legs()!![0].steps()
-            mapView!!.getMapAsync(this)
+        Mapbox.getInstance(this, BuildConfig.MAP_BOX_API_ACCESS_TOKEN)
+        mMapView = findViewById(R.id.map_view)
+        mMapView!!.onCreate(savedInstanceState)
+
+        mMapView!!.getMapAsync { mapboxMap ->
+            map = mapboxMap
+            mapboxMap.addMarker(MarkerOptions().position(destination))
+
+            initializeLocationEngine()
+            enableLocationPlugin()
+
+            val originPoint = Point.fromLngLat(sourceLongitude, sourceLatitude)
+            val destinationPoint = Point.fromLngLat(destinationLongitude, destinationLatitude)
+
+            mNavigationService = NavigationService(this, locationEngine!!)
+            mNavigationService!!.addProgressChangeListener { instruction, iconID, stepIndex, distanceRemaining, durationRemaining ->
+                debugTextView.setText("$instruction $iconID $stepIndex")
+            }
+            mNavigationService!!.startNavigation(originPoint, destinationPoint, { currentRoute ->
+                val navigationMapRoute = NavigationMapRoute(null, mMapView!!, map!!, R.style.NavigationMapRoute)
+                navigationMapRoute.addRoute(currentRoute)
+            })
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap?) {
+    private fun enableLocationPlugin() {
         try {
-            val locations = steps!!.map { step ->
-                val location = step.maneuver().location()
-                LatLng(location.latitude(), location.longitude())
-            }
-
-            googleMap!!.isMyLocationEnabled = true
-
-            googleMap.addPolyline(PolylineOptions()
-                    .addAll(locations))
-
-
-            val origin = locations[0]
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 9f))
-
-            Log.d("onMapReady", "Ready!")
-
-
+            locationPlugin = LocationLayerPlugin(mMapView!!, map!!, locationEngine!!)
+            locationPlugin!!.setLocationLayerEnabled(LocationLayerMode.TRACKING)
         } catch (e: SecurityException) {
-            e.printStackTrace()
+
         }
+    }
+
+    private fun initializeLocationEngine() {
+        locationEngine = LostLocationEngine(this)
+        locationEngine!!.addLocationEngineListener(this)
+        locationEngine!!.priority = LocationEnginePriority.HIGH_ACCURACY
+        locationEngine!!.activate()
+    }
+
+    private fun setCameraPosition(location: android.location.Location) {
+        map!!.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                LatLng(location.latitude, location.longitude), 16.0))
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mMapView!!.onStart()
     }
 
     override fun onResume() {
-        mapView!!.onResume()
         super.onResume()
+        mMapView!!.onResume()
     }
 
-    override fun onDestroy() {
-        mapView!!.onDestroy()
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
+        mMapView!!.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMapView!!.onStop()
     }
 
     override fun onLowMemory() {
-        mapView!!.onLowMemory()
         super.onLowMemory()
+        mMapView!!.onLowMemory()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mMapView!!.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mMapView!!.onSaveInstanceState(outState)
+    }
 
     companion object {
         private const val SOURCE_LATITUDE = "source_latitude"
@@ -109,6 +151,18 @@ class NavigationActivity : AppCompatActivity(), OnMapReadyCallback {
             intent.putExtra(DESTINATION_LONGITUDE, destinationLocation.longitude)
 
             return intent
+        }
+    }
+
+    override fun onLocationChanged(location: android.location.Location?) {
+        setCameraPosition(location!!)
+    }
+
+    override fun onConnected() {
+        try {
+            locationEngine!!.requestLocationUpdates()
+        } catch (e: SecurityException) {
+
         }
     }
 }
