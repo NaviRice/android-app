@@ -10,7 +10,7 @@ import navirice.proto.StepOuterClass
  * @author Yang Liu
  * @version Feb 8, 2018
  */
-object StepService {
+object StepDataService {
 
     fun updateCurrentStep(context: Context, step: Step) {
         val requestBuilder = RequestOuterClass.Request.newBuilder()

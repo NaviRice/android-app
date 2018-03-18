@@ -23,7 +23,7 @@ import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.models.Step
 import com.navirice.android.services.NavigationService
-import com.navirice.android.services.realTimeDataServices.StepService
+import com.navirice.android.services.realTimeDataServices.StepDataService
 
 
 /**
@@ -71,7 +71,7 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
             mNavigationService!!.addProgressChangeListener { name, instruction, iconID, location, distanceRemaining, durationRemaining ->
 
                 val step = Step(name, instruction, iconID, location)
-                StepService.updateCurrentStep(this, step)
+                StepDataService.updateCurrentStep(this, step)
             }
             mNavigationService!!.startNavigation(originPoint, destinationPoint, { currentRoute ->
                 val navigationMapRoute = NavigationMapRoute(null, mMapView!!, map!!, R.style.NavigationMapRoute)
