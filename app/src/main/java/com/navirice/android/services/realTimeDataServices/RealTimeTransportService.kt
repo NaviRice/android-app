@@ -8,7 +8,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.navirice.android.contracts.ActionContract
 import com.navirice.android.contracts.DataChannelServiceContract
-import navirice.proto.RequestOuterClass
+import navirice.proto.RequestHeaderOuterClass
 import navirice.proto.ResponseOuterClass
 
 /**
@@ -73,10 +73,10 @@ object RealTimeTransportService {
         }, IntentFilter(ActionContract.RECEIVE_DATA))
     }
 
-    fun send(context: Context, request: RequestOuterClass.Request) {
+    fun send(context: Context, requestHeader: RequestHeaderOuterClass.RequestHeader, body: ByteArray) {
         val localBroadcastManager = LocalBroadcastManager.getInstance(context)
         val intent = Intent(ActionContract.SEND_DATA)
-        intent.putExtra(DataChannelServiceContract.DATA, request.toByteArray())
+        intent.putExtra(DataChannelServiceContract.DATA, requestHeader.toByteArray() + body)
         localBroadcastManager.sendBroadcast(intent)
     }
 

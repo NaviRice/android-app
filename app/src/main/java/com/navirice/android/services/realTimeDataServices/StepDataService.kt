@@ -3,7 +3,7 @@ package com.navirice.android.services.realTimeDataServices
 import android.content.Context
 import android.util.Log
 import com.navirice.android.models.Step
-import navirice.proto.RequestOuterClass
+import navirice.proto.RequestHeaderOuterClass
 import navirice.proto.StepOuterClass
 
 /**
@@ -13,8 +13,8 @@ import navirice.proto.StepOuterClass
 object StepDataService {
 
     fun updateCurrentStep(context: Context, step: Step) {
-        val requestBuilder = RequestOuterClass.Request.newBuilder()
-        requestBuilder.type = RequestOuterClass.Request.Type.CURRENT_STEP
+        val requestHeaderBuilder = RequestHeaderOuterClass.RequestHeader.newBuilder()
+        requestHeaderBuilder.type = RequestHeaderOuterClass.RequestHeader.Type.CURRENT_STEP
 
         val stepBuilder = StepOuterClass.Step.newBuilder()
 
@@ -25,13 +25,12 @@ object StepDataService {
 
         val stepData = stepBuilder.build()
 
-        requestBuilder.length = stepData.serializedSize
-        requestBuilder.body = stepData.toByteString()
+        requestHeaderBuilder.length = stepData.serializedSize
+        val requestHeader = requestHeaderBuilder.build()
 
-        val request = requestBuilder.build()
+        Log.d(this.javaClass.simpleName, requestHeader.toString())
+        Log.d(this.javaClass.simpleName, stepData.toString())
 
-        Log.d(this.javaClass.simpleName, request.toString())
-
-        RealTimeTransportService.send(context, request)
+        RealTimeTransportService.send(context, requestHeader, stepData.toByteArray())
     }
 }
