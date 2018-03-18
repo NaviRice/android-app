@@ -1,4 +1,4 @@
-package com.navirice.android.services
+package com.navirice.android.services.realTimeDataServices
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -17,6 +17,7 @@ import navirice.proto.ResponseOuterClass
  */
 
 object RealTimeTransportService {
+    private var connected = false
     fun start(context: Context, serverIP: String, serverPort: Int) {
 
         val intent = Intent(context, DataChannelService::class.java)
@@ -31,6 +32,7 @@ object RealTimeTransportService {
             override fun onReceive(context: Context, intent: Intent) {
                 localBroadcastManager.unregisterReceiver(this)
                 Log.d("RealTimeTransport", "CONNECTED")
+                connected = true
                 onConnectedHandler()
             }
         }, IntentFilter(ActionContract.CONNECTED))
@@ -42,7 +44,7 @@ object RealTimeTransportService {
             override fun onReceive(context: Context, intent: Intent) {
                 localBroadcastManager.unregisterReceiver(this)
                 Log.d("RealTimeTransport", "DISCONNECTED")
-
+                connected = false
                 onDisconnectedFromServerHandler()
             }
         }, IntentFilter(ActionContract.DISCONNECTED))
@@ -76,5 +78,9 @@ object RealTimeTransportService {
         val intent = Intent(ActionContract.SEND_DATA)
         intent.putExtra(DataChannelServiceContract.DATA, request.toByteArray())
         localBroadcastManager.sendBroadcast(intent)
+    }
+
+    fun isConnected(): Boolean {
+        return connected
     }
 }

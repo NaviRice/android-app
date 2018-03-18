@@ -1,4 +1,4 @@
-package com.navirice.android.services
+package com.navirice.android.services.realTimeDataServices
 
 
 import com.navirice.android.tasks.InputStreamTask
@@ -43,6 +43,7 @@ class StreamingService {
             mOutputStream = DataOutputStream(mClient!!.getOutputStream())
         } catch (e: IOException) {
             mOnServerNotFound!!()
+            return
         }
 
         mOnConnected!!()

@@ -1,4 +1,4 @@
-package com.navirice.android.services
+package com.navirice.android.services.realTimeDataServices
 
 import android.app.Service
 import android.content.BroadcastReceiver

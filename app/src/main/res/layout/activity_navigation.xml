@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto">
-    <TextView
-        android:id="@+id/text_view_debug"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"/>
-</LinearLayout>
+</FrameLayout>

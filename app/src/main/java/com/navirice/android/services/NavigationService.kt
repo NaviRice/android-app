@@ -9,6 +9,7 @@ import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
 import com.mapbox.services.android.telemetry.location.LocationEngine
 import com.navirice.android.BuildConfig
 import com.navirice.android.Utilities
+import com.navirice.android.models.Location
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,9 +26,10 @@ class NavigationService {
         navigation!!.locationEngine = locationEngine
     }
 
-    fun addProgressChangeListener(onCurrentStep: (instruction: String?,
+    fun addProgressChangeListener(onCurrentStep: (name: String,
+                                                  instruction: String,
                                                   iconID: String,
-                                                  stepIndex: Int,
+                                                  location: Location,
                                                   distanceRemaining: Double,
                                                   durationRemaining: Double) -> Unit) {
 
@@ -40,10 +42,14 @@ class NavigationService {
                 val maneuver = upComingStep.maneuver()
                 val iconID = Utilities.getIconIdentifier(maneuver)
 
-                val instruction = maneuver.instruction()
-                val stepIndex = routeProgress.currentLegProgress().stepIndex()
+                var name = upComingStep.name()
+                name = if(name != null) name else ""
+                val point = maneuver.location()
+                val location = Location(point.longitude(), point.latitude())
+                var instruction = maneuver.instruction()
+                instruction = if(instruction != null) instruction else ""
 
-                onCurrentStep(instruction, iconID, stepIndex, currentProgress.distanceRemaining(), currentProgress.durationRemaining())
+                onCurrentStep(name, instruction, iconID, location, currentProgress.distanceRemaining(), currentProgress.durationRemaining())
             }
         }
     }

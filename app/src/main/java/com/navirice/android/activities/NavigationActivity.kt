@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.TextView
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -22,7 +21,9 @@ import com.mapbox.services.android.telemetry.location.LostLocationEngine
 import com.navirice.android.BuildConfig
 import com.navirice.android.R
 import com.navirice.android.models.Location
+import com.navirice.android.models.Step
 import com.navirice.android.services.NavigationService
+import com.navirice.android.services.realTimeDataServices.StepService
 
 
 /**
@@ -42,8 +43,6 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
-
-        val debugTextView = findViewById<TextView>(R.id.text_view_debug)
 
         val sourceLatitude = intent.getDoubleExtra(SOURCE_LATITUDE, 0.0)
         val sourceLongitude = intent.getDoubleExtra(SOURCE_LONGITUDE, 0.0)
@@ -69,8 +68,10 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
             val destinationPoint = Point.fromLngLat(destinationLongitude, destinationLatitude)
 
             mNavigationService = NavigationService(this, locationEngine!!)
-            mNavigationService!!.addProgressChangeListener { instruction, iconID, stepIndex, distanceRemaining, durationRemaining ->
-                debugTextView.setText("$instruction $iconID $stepIndex")
+            mNavigationService!!.addProgressChangeListener { name, instruction, iconID, location, distanceRemaining, durationRemaining ->
+
+                val step = Step(name, instruction, iconID, location)
+                StepService.updateCurrentStep(this, step)
             }
             mNavigationService!!.startNavigation(originPoint, destinationPoint, { currentRoute ->
                 val navigationMapRoute = NavigationMapRoute(null, mMapView!!, map!!, R.style.NavigationMapRoute)

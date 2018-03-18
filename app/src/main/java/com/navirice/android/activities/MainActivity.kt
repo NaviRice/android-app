@@ -12,16 +12,13 @@ import android.widget.Toast
 import com.jakewharton.rxbinding2.view.RxView
 import com.navirice.android.R
 import com.navirice.android.models.Location
-import com.navirice.android.models.Step
 import com.navirice.android.services.GeocodingService
 import com.navirice.android.services.LocationService
-import com.navirice.android.services.RealTimeTransportService
-import com.navirice.android.services.StepService
+import com.navirice.android.services.realTimeDataServices.RealTimeTransportService
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
-import java.util.*
 
 
 /**
@@ -46,11 +43,13 @@ class MainActivity : AppCompatActivity() {
     private var mSourceSubject: Subject<Location>? = null
 
     // Observables
-    private var clickStartNavigationObservable: Observable<Any>? = null
-    private var clickConnectToServerObservable: Observable<Any>? = null
-    private var destinationObservable: Observable<Location>? = null
+    private var mClickStartNavigationObservable: Observable<Any>? = null
+    private var mClickConnectToServerObservable: Observable<Any>? = null
+    private var mDestinationObservable: Observable<Location>? = null
 
-    val random = Random()
+    private var mConnectedString: String? = null
+    private var mConnectString: String? = null
+    private var mToast: Toast? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         initObservables()
 
-        Observables.combineLatest(mSourceSubject!!, destinationObservable!!)
+        Observables.combineLatest(mSourceSubject!!, mDestinationObservable!!)
                 .subscribe(this::startNavigation)
 
         mSourceSubject!!
@@ -69,7 +68,21 @@ class MainActivity : AppCompatActivity() {
 
         getCurrentLocation()
 
+
+        mConnectedString = getString(R.string.connected)
+        mConnectString = getString(R.string.connect)
+
+        mToast = Toast.makeText(this, getString(R.string.fail_to_connect), Toast.LENGTH_SHORT)
+
         initClickToServerHandler()
+
+        if(RealTimeTransportService.isConnected()) {
+            handleServerEvents()
+
+            mConnectToServerButton!!.text = mConnectedString
+            mConnectToServerButton!!.isEnabled = false
+            mStartNavigationButton!!.isEnabled = true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -80,10 +93,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.test_nav_item -> {
-
-                val step = Step("", "Instruction", "Icon", Location(random.nextDouble(), random.nextDouble()))
-                StepService.updateCurrentStep(this, step)
-//                startNavigation(Pair(Location(-71.806651, 42.274869), Location(-71.807196, 42.275899)))
+                startNavigation(Pair(Location(-71.806651, 42.274869), Location(-71.807196, 42.275899)))
                 return true
             }
         }
@@ -112,7 +122,33 @@ class MainActivity : AppCompatActivity() {
                 TextView.BufferType.EDITABLE)
     }
 
-    private fun connectToServer(connectedString: String, connectString: String, toast: Toast): (_: Any) -> Unit {
+    private fun handleServerEvents() {
+        RealTimeTransportService.onConnected(this, {
+            Log.d("RealTimeTransport", "onConnected")
+            mConnectToServerButton!!.text = mConnectedString
+            mStartNavigationButton!!.isEnabled = true
+        })
+
+        RealTimeTransportService.onDisconnected(this, {
+            Log.d("RealTimeTransport", "onDisconnected")
+            mConnectToServerButton!!.text = mConnectString
+            mConnectToServerButton!!.isEnabled = true
+            mStartNavigationButton!!.isEnabled = false
+        })
+
+        RealTimeTransportService.onReceiveResponse(this, { response ->
+            Log.d("RealTimeTransport", response.toString())
+        })
+
+        RealTimeTransportService.onServerNotFound(this, {
+            Log.d("RealTimeTransport", "onServerNotFound")
+            mConnectToServerButton!!.text = mConnectString
+            mConnectToServerButton!!.isEnabled = true
+            mToast!!.show()
+        })
+    }
+
+    private fun connectToServer(): (_: Any) -> Unit {
         return { _ ->
             val serverIP = mServerIPEditText!!.text.toString()
             val serverPort = mServerPortEditText!!.text.toString().toInt()
@@ -120,29 +156,7 @@ class MainActivity : AppCompatActivity() {
             mConnectToServerButton!!.isEnabled = false
             mConnectToServerButton!!.text = getString(R.string.connecting)
 
-            RealTimeTransportService.onConnected(this, {
-                Log.d("RealTimeTransport", "onConnected")
-                mConnectToServerButton!!.text = connectedString
-                mStartNavigationButton!!.isEnabled = true
-            })
-
-            RealTimeTransportService.onDisconnected(this, {
-                Log.d("RealTimeTransport", "onDisconnected")
-                mConnectToServerButton!!.text = connectString
-                mConnectToServerButton!!.isEnabled = true
-                mStartNavigationButton!!.isEnabled = false
-            })
-
-            RealTimeTransportService.onReceiveResponse(this, { response ->
-                Log.d("RealTimeTransport", response.toString())
-            })
-
-            RealTimeTransportService.onServerNotFound(this, {
-                Log.d("RealTimeTransport", "onServerNotFound")
-                mConnectToServerButton!!.text = connectString
-                mConnectToServerButton!!.isEnabled = true
-                toast.show()
-            })
+            handleServerEvents()
 
             RealTimeTransportService.start(this, serverIP, serverPort)
         }
@@ -150,17 +164,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initClickToServerHandler() {
-        val connectedString = getString(R.string.connected)
-        val connectString = getString(R.string.connect)
-        val toast = Toast.makeText(this, getString(R.string.fail_to_connect), Toast.LENGTH_SHORT)
-
-        clickConnectToServerObservable!!.subscribe(connectToServer(connectedString, connectString, toast))
+        mClickConnectToServerObservable!!.subscribe(connectToServer())
     }
 
     private fun initObservables() {
-        clickStartNavigationObservable = RxView.clicks(mStartNavigationButton!!)
-        clickConnectToServerObservable = RxView.clicks(mConnectToServerButton!!)
-        destinationObservable = clickStartNavigationObservable!!
+        mClickStartNavigationObservable = RxView.clicks(mStartNavigationButton!!)
+        mClickConnectToServerObservable = RxView.clicks(mConnectToServerButton!!)
+        mDestinationObservable = mClickStartNavigationObservable!!
                 .map(this::getDestination)
         mSourceSubject = BehaviorSubject.create()
     }

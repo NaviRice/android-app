@@ -1,7 +1,7 @@
 package com.navirice.android.tasks
 
 import android.os.AsyncTask
-import com.navirice.android.services.StreamingService
+import com.navirice.android.services.realTimeDataServices.StreamingService
 
 /**
  * @author Yang Liu
