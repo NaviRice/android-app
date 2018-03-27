@@ -2,6 +2,10 @@ package com.navirice.android.activities
 
 import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorManager
+import android.hardware.TriggerEvent
+import android.hardware.TriggerEventListener
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.mapbox.geojson.Point
@@ -23,7 +27,9 @@ import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.models.Step
 import com.navirice.android.services.NavigationService
+import com.navirice.android.services.realTimeDataServices.AccelerationForceDataService
 import com.navirice.android.services.realTimeDataServices.LocationDataService
+import com.navirice.android.services.realTimeDataServices.RotationRateDataService
 import com.navirice.android.services.realTimeDataServices.StepDataService
 
 
@@ -40,6 +46,10 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
     private var locationEngine: LocationEngine? = null
     private var origin: Location? = null
     private var destination: LatLng? = null
+
+    private var mSensorManager: SensorManager? = null
+    private var mLinearAcceleratorSensor: Sensor? = null
+    private var mGyroscopeSensor: Sensor? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +89,25 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
                 navigationMapRoute.addRoute(currentRoute)
             })
         }
+
+
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mLinearAcceleratorSensor = mSensorManager!!.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        mGyroscopeSensor = mSensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+
+        val context = this
+        mSensorManager!!.requestTriggerSensor(object : TriggerEventListener() {
+            override fun onTrigger(event: TriggerEvent) {
+                AccelerationForceDataService.updateAccelerationForce(context, event.values[0], event.values[1], event.values[2])
+            }
+        }, mLinearAcceleratorSensor)
+
+        mSensorManager!!.requestTriggerSensor(object : TriggerEventListener() {
+            override fun onTrigger(event: TriggerEvent) {
+                RotationRateDataService.updateRotationRate(context, event.values[0], event.values[1], event.values[2])
+            }
+        }, mGyroscopeSensor)
+
     }
 
     private fun enableLocationPlugin() {
