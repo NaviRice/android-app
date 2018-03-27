@@ -13,11 +13,11 @@ public final class ResponseOuterClass {
       com.google.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
-    int getStatusValue();
+    boolean hasStatus();
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
     navirice.proto.ResponseOuterClass.Response.Status getStatus();
   }
@@ -48,7 +48,6 @@ public final class ResponseOuterClass {
        * <code>NOT_IMPLEMENTED = 2;</code>
        */
       NOT_IMPLEMENTED(2),
-      UNRECOGNIZED(-1),
       ;
 
       /**
@@ -107,50 +106,46 @@ public final class ResponseOuterClass {
       // @@protoc_insertion_point(enum_scope:navirice.proto.Response.Status)
     }
 
+    private int bitField0_;
     public static final int STATUS_FIELD_NUMBER = 1;
     private int status_;
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
-    public int getStatusValue() {
-      return status_;
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
     public navirice.proto.ResponseOuterClass.Response.Status getStatus() {
       navirice.proto.ResponseOuterClass.Response.Status result = navirice.proto.ResponseOuterClass.Response.Status.forNumber(status_);
-      return result == null ? navirice.proto.ResponseOuterClass.Response.Status.UNRECOGNIZED : result;
+      return result == null ? navirice.proto.ResponseOuterClass.Response.Status.SUCCESS : result;
     }
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
-     */
-    private void setStatusValue(int value) {
-        status_ = value;
-    }
-    /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
     private void setStatus(navirice.proto.ResponseOuterClass.Response.Status value) {
       if (value == null) {
         throw new NullPointerException();
       }
-      
+      bitField0_ |= 0x00000001;
       status_ = value.getNumber();
     }
     /**
-     * <code>optional .navirice.proto.Response.Status status = 1;</code>
+     * <code>required .navirice.proto.Response.Status status = 1;</code>
      */
     private void clearStatus() {
-      
+      bitField0_ = (bitField0_ & ~0x00000001);
       status_ = 0;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (status_ != navirice.proto.ResponseOuterClass.Response.Status.SUCCESS.getNumber()) {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeEnum(1, status_);
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -158,10 +153,11 @@ public final class ResponseOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (status_ != navirice.proto.ResponseOuterClass.Response.Status.SUCCESS.getNumber()) {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, status_);
       }
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
@@ -249,27 +245,19 @@ public final class ResponseOuterClass {
 
 
       /**
-       * <code>optional .navirice.proto.Response.Status status = 1;</code>
+       * <code>required .navirice.proto.Response.Status status = 1;</code>
        */
-      public int getStatusValue() {
-        return instance.getStatusValue();
+      public boolean hasStatus() {
+        return instance.hasStatus();
       }
       /**
-       * <code>optional .navirice.proto.Response.Status status = 1;</code>
-       */
-      public Builder setStatusValue(int value) {
-        copyOnWrite();
-        instance.setStatusValue(value);
-        return this;
-      }
-      /**
-       * <code>optional .navirice.proto.Response.Status status = 1;</code>
+       * <code>required .navirice.proto.Response.Status status = 1;</code>
        */
       public navirice.proto.ResponseOuterClass.Response.Status getStatus() {
         return instance.getStatus();
       }
       /**
-       * <code>optional .navirice.proto.Response.Status status = 1;</code>
+       * <code>required .navirice.proto.Response.Status status = 1;</code>
        */
       public Builder setStatus(navirice.proto.ResponseOuterClass.Response.Status value) {
         copyOnWrite();
@@ -277,7 +265,7 @@ public final class ResponseOuterClass {
         return this;
       }
       /**
-       * <code>optional .navirice.proto.Response.Status status = 1;</code>
+       * <code>required .navirice.proto.Response.Status status = 1;</code>
        */
       public Builder clearStatus() {
         copyOnWrite();
@@ -287,6 +275,7 @@ public final class ResponseOuterClass {
 
       // @@protoc_insertion_point(builder_scope:navirice.proto.Response)
     }
+    private byte memoizedIsInitialized = -1;
     protected final Object dynamicMethod(
         com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,
         Object arg0, Object arg1) {
@@ -295,7 +284,20 @@ public final class ResponseOuterClass {
           return new navirice.proto.ResponseOuterClass.Response();
         }
         case IS_INITIALIZED: {
+          byte isInitialized = memoizedIsInitialized;
+          if (isInitialized == 1) return DEFAULT_INSTANCE;
+          if (isInitialized == 0) return null;
+
+          boolean shouldMemoize = ((Boolean) arg0).booleanValue();
+          if (!hasStatus()) {
+            if (shouldMemoize) {
+              memoizedIsInitialized = 0;
+            }
+            return null;
+          }
+          if (shouldMemoize) memoizedIsInitialized = 1;
           return DEFAULT_INSTANCE;
+
         }
         case MAKE_IMMUTABLE: {
           return null;
@@ -306,9 +308,11 @@ public final class ResponseOuterClass {
         case VISIT: {
           Visitor visitor = (Visitor) arg0;
           navirice.proto.ResponseOuterClass.Response other = (navirice.proto.ResponseOuterClass.Response) arg1;
-          status_ = visitor.visitInt(status_ != 0, status_,    other.status_ != 0, other.status_);
+          status_ = visitor.visitInt(hasStatus(), status_,
+              other.hasStatus(), other.status_);
           if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
               .INSTANCE) {
+            bitField0_ |= other.bitField0_;
           }
           return this;
         }
@@ -326,15 +330,20 @@ public final class ResponseOuterClass {
                   done = true;
                   break;
                 default: {
-                  if (!input.skipField(tag)) {
+                  if (!parseUnknownField(tag, input)) {
                     done = true;
                   }
                   break;
                 }
                 case 8: {
                   int rawValue = input.readEnum();
-
-                  status_ = rawValue;
+                  navirice.proto.ResponseOuterClass.Response.Status value = navirice.proto.ResponseOuterClass.Response.Status.forNumber(rawValue);
+                  if (value == null) {
+                    super.mergeVarintField(1, rawValue);
+                  } else {
+                    bitField0_ |= 0x00000001;
+                    status_ = rawValue;
+                  }
                   break;
                 }
               }
