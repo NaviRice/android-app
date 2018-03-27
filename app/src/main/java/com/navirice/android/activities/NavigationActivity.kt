@@ -23,6 +23,7 @@ import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.models.Step
 import com.navirice.android.services.NavigationService
+import com.navirice.android.services.realTimeDataServices.LocationDataService
 import com.navirice.android.services.realTimeDataServices.StepDataService
 
 
@@ -92,6 +93,7 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
     private fun initializeLocationEngine() {
         locationEngine = LostLocationEngine(this)
         locationEngine!!.addLocationEngineListener(this)
+        locationEngine!!.interval = 200
         locationEngine!!.priority = LocationEnginePriority.HIGH_ACCURACY
         locationEngine!!.activate()
     }
@@ -155,8 +157,10 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
         }
     }
 
-    override fun onLocationChanged(location: android.location.Location?) {
-        setCameraPosition(location!!)
+    override fun onLocationChanged(androidLocation: android.location.Location?) {
+        setCameraPosition(androidLocation!!)
+        val location = Location(androidLocation.longitude, androidLocation.latitude)
+        LocationDataService.updateCurrentLocation(this, location)
     }
 
     override fun onConnected() {
