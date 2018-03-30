@@ -2,7 +2,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/test_nav_item"
+    <item android:id="@+id/test_item"
         app:showAsAction="ifRoom"
-        android:title="Test Nav"/>
+        android:title="Test"/>
 </menu>

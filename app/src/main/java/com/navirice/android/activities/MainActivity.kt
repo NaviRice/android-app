@@ -85,21 +85,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.test_nav_item -> {
-                startNavigation(Pair(Location(-71.806651, 42.274869), Location(-71.807196, 42.275899)))
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun getCurrentLocation() {
         if (!mLocationService!!.checkPermission(this))
             mLocationService!!.requestPermission(this)

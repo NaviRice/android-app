@@ -8,6 +8,8 @@ import android.hardware.TriggerEvent
 import android.hardware.TriggerEventListener
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -27,10 +29,7 @@ import com.navirice.android.R
 import com.navirice.android.models.Location
 import com.navirice.android.models.Step
 import com.navirice.android.services.NavigationService
-import com.navirice.android.services.realTimeDataServices.AccelerationForceDataService
-import com.navirice.android.services.realTimeDataServices.LocationDataService
-import com.navirice.android.services.realTimeDataServices.RotationRateDataService
-import com.navirice.android.services.realTimeDataServices.StepDataService
+import com.navirice.android.services.realTimeDataServices.*
 
 
 /**
@@ -108,6 +107,21 @@ class NavigationActivity : AppCompatActivity(), LocationEngineListener {
             }
         }, mGyroscopeSensor)
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_navigation, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.test_item -> {
+                OnButtonClickDataService.onButtonClick(this)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun enableLocationPlugin() {
